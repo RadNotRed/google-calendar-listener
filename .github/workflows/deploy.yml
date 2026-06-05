@@ -3,7 +3,7 @@ name: Deploy to Server
 on:
   push:
     branches:
-      - master
+      - main
 
 jobs:
   deploy:
@@ -18,7 +18,7 @@ jobs:
 
       - name: Pull and Deploy
         run: |
-          cd /home/rad/cinnamon-calender
+          cd /home/rad/cinnamon-gcal-listener
           docker compose down
           git pull
           docker compose build
