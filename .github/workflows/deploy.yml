@@ -1,0 +1,32 @@
+name: Deploy to Server
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+
+    steps:
+      - name: Notify Discord (Deploying)
+        run: |
+          curl -H "Content-Type: application/json" \
+               -d '{"content": "🚀 **GitHub commit detected!** [View Commit](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }})\nRestarting server now, the bot may be down for a moment..."}' \
+               ${{ secrets.DISCORD_WEBHOOK_URL }}
+
+      - name: Pull and Deploy
+        run: |
+          cd /home/rad/cinnamon-calender
+          docker compose down
+          git pull
+          docker compose build
+          docker compose up -d
+
+      - name: Notify Discord (Success)
+        if: success()
+        run: |
+          curl -H "Content-Type: application/json" \
+               -d '{"content": "✅ **Update complete!** The server has been successfully restarted."}' \
+               ${{ secrets.DISCORD_WEBHOOK_URL }}
