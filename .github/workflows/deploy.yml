@@ -2,8 +2,6 @@ name: Deploy to Server
 
 on:
   push:
-    branches:
-      - main
 
 jobs:
   deploy:
@@ -12,9 +10,11 @@ jobs:
     steps:
       - name: Notify Discord (Deploying)
         run: |
-          curl -H "Content-Type: application/json" \
-               -d '{"content": "🚀 **GitHub commit detected!** [View Commit](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }})\nRestarting server now, the bot may be down for a moment..."}' \
-               ${{ secrets.DISCORD_WEBHOOK_URL }}
+          if [ -n "${{ secrets.DISCORD_WEBHOOK_URL }}" ]; then
+            curl -H "Content-Type: application/json" \
+                 -d '{"content": "🚀 **GitHub commit detected!** [View Commit](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }})\nRestarting server now, the bot may be down for a moment..."}' \
+                 ${{ secrets.DISCORD_WEBHOOK_URL }}
+          fi
 
       - name: Pull and Deploy
         run: |
@@ -27,6 +27,8 @@ jobs:
       - name: Notify Discord (Success)
         if: success()
         run: |
-          curl -H "Content-Type: application/json" \
-               -d '{"content": "✅ **Update complete!** The server has been successfully restarted."}' \
-               ${{ secrets.DISCORD_WEBHOOK_URL }}
+          if [ -n "${{ secrets.DISCORD_WEBHOOK_URL }}" ]; then
+            curl -H "Content-Type: application/json" \
+                 -d '{"content": "✅ **Update complete!** The server has been successfully restarted."}' \
+                 ${{ secrets.DISCORD_WEBHOOK_URL }}
+          fi
