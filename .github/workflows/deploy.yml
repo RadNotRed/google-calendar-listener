@@ -20,11 +20,15 @@ jobs:
 
       - name: Pull and deploy
         run: |
-          cd /home/rad/projects/cinnamon-gcal-listener
-          git fetch origin main
+          git config --global --add safe.directory /home/rad/projects/google-calendar-listener || true
+
+          cd /home/rad/projects/google-calendar-listener
+
+          GIT_SSH_COMMAND="ssh -o StrictHostKeyChecking=accept-new" git fetch origin main
           git reset --hard origin/main
+
           docker compose down
-          docker compose up -d --build
+          docker compose up -d --build --remove-orphans
 
       - name: Notify Discord - Success
         if: success()
